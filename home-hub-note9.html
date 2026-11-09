@@ -177,11 +177,13 @@ const ICON = {
   fog: `<svg viewBox="0 0 24 24" ${S}><path d="M4 9h16M3 13h18M5 17h14"/></svg>`,
   rain: `<svg viewBox="0 0 24 24" ${S}>${C2}<path d="M8 18l-1 2.5M12 18l-1 2.5M16 18l-1 2.5"/></svg>`,
   snow: `<svg viewBox="0 0 24 24" ${S}>${C2}<path d="M8 19h.01M12 20.5h.01M16 19h.01"/></svg>`,
-  storm: `<svg viewBox="0 0 24 24" ${S}>${C2}<path d="M12.5 16l-2 3h3l-2 3"/></svg>`
+  storm: `<svg viewBox="0 0 24 24" ${S}>${C2}<path d="M12.5 16l-2 3h3l-2 3"/></svg>`,
+  moon: `<svg viewBox="0 0 24 24" ${S}><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>`,
+  partlyNight: `<svg viewBox="0 0 24 24" ${S}><path d="M12 9.2A4 4 0 1 1 6.8 4a3.2 3.2 0 0 0 5.2 5.2z"/><path d="M9 20h8a3.5 3.5 0 0 0 .3-6.98A5 5 0 0 0 8.2 12.3 3.8 3.8 0 0 0 9 20z"/></svg>`
 };
-function wmo(c) {
-  if (c === 0) return ['맑음', 'sun'];
-  if (c <= 2) return ['구름 조금', 'partly'];
+function wmo(c, day = 1) {
+  if (c === 0) return ['맑음', day ? 'sun' : 'moon'];
+  if (c <= 2) return ['구름 조금', day ? 'partly' : 'partlyNight'];
   if (c === 3) return ['흐림', 'cloud'];
   if (c <= 48) return ['안개', 'fog'];
   if (c <= 67 || (c >= 80 && c <= 82)) return ['비', 'rain'];
@@ -190,11 +192,11 @@ function wmo(c) {
 }
 async function weather() {
   try {
-    const u = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code&hourly=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=2`;
+    const u = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,is_day&hourly=temperature_2m,weather_code,is_day&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=2`;
     const r = await fetch(u);
     if (!r.ok) throw new Error('bad');
     const j = await r.json();
-    const [desc, ic] = wmo(j.current.weather_code);
+    const [desc, ic] = wmo(j.current.weather_code, j.current.is_day);
     const now = j.current.time.slice(0, 13);
     let i = j.hourly.time.findIndex(t => t.slice(0, 13) === now);
     if (i < 0) i = 0;
@@ -202,11 +204,11 @@ async function weather() {
     for (let k = 1; k <= 4; k++) {
       const idx = i + k * 2;
       if (idx >= j.hourly.time.length) break;
-      hours += `<div><div class="h">${Number(j.hourly.time[idx].slice(11, 13))}시</div>${ICON[wmo(j.hourly.weather_code[idx])[1]]}<div class="t">${Math.round(j.hourly.temperature_2m[idx])}°</div></div>`;
+      hours += `<div><div class="h">${Number(j.hourly.time[idx].slice(11, 13))}시</div>${ICON[wmo(j.hourly.weather_code[idx], j.hourly.is_day[idx])[1]]}<div class="t">${Math.round(j.hourly.temperature_2m[idx])}°</div></div>`;
     }
     $('#wx').innerHTML = `
       <div class="wx-now">${ICON[ic]}<div><div class="wx-temp num">${Math.round(j.current.temperature_2m)}°</div><div class="wx-desc">${desc}</div></div></div>
-      <div class="wx-sub">최고 ${Math.round(j.daily.temperature_2m_max[0])}° 최저 ${Math.round(j.daily.temperature_2m_min[0])}° · 비 ${Math.round(j.daily.precipitation_probability_max[0] ?? 0)}%</div>
+      <div class="wx-sub">최고 ${Math.round(j.daily.temperature_2m_max[0])}° 최저 ${Math.round(j.daily.temperature_2m_min[0])}°<br>오늘 비 올 확률 ${Math.round(j.daily.precipitation_probability_max[0] ?? 0)}%</div>
       <div class="hours">${hours}</div>`;
   } catch (e) {
     $('#wx').innerHTML = '<p class="wx-off">여기서는 날씨를 불러올 수 없어요. 깃허브 페이지 같은 내 주소에 올려서 열면 실시간 날씨가 보여요.</p>';
