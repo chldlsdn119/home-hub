@@ -306,15 +306,41 @@ async function haState(id) {
   return Number.isFinite(v) ? v : null;
 }
 const inOff = msg => { setGrade($('#inTile'), null); $('#inAir').innerHTML = `<span class="t-off" style="display:block">${msg}</span>`; };
-async function indoorAir() {
-  if (!ha || !ha.url || !ha.token || !ha.pm) { inOff('공기청정기 연결 전이에요.<br>눌러서 설정'); return null; }
+// 노트9 안의 air_poller가 허브 옆에 저장하는 air.json (토큰 없이 읽기)
+async function localAir() {
   try {
-    const [pm, hum, temp] = await Promise.all([
+    const r = await fetch('air.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) return null;
+    const j = await r.json();
+    if (typeof j.pm25 !== 'number' || !j.updated) return null;
+    return j;
+  } catch (e) { return null; }
+}
+async function indoorAir() {
+  let pm, hum = null, temp = null;
+  if (!ha || !ha.url || !ha.token || !ha.pm) {
+    const j = await localAir();
+    if (!j) { inOff('공기청정기 연결 전이에요.<br>눌러서 설정'); return null; }
+    if (Date.now() / 1000 - j.updated > 10 * 60) { inOff('공기청정기가 응답하지 않아요.<br>전원과 와이파이를 확인해 주세요'); return null; }
+    showIndoor(j.pm25, j.humidity ?? null, j.temperature ?? null);
+    return true;
+  }
+  try {
+    [pm, hum, temp] = await Promise.all([
       haState(ha.pm),
       ha.hum ? haState(ha.hum).catch(() => null) : null,
       ha.temp ? haState(ha.temp).catch(() => null) : null
     ]);
     if (pm === null) throw new Error('공기청정기 값이 비어 있어요.');
+    showIndoor(pm, hum, temp);
+    return true;
+  } catch (e) {
+    const msg = e instanceof TypeError ? 'Home Assistant에 연결하지 못했어요.' : e.message;
+    inOff(`${esc(msg)}<br>눌러서 설정 확인`);
+    return msg;
+  }
+}
+function showIndoor(pm, hum, temp) {
     const g = grade(pm, CUT.pm25);
     let extra = '';
     if (hum !== null) extra += ` · 습도 <b>${Math.round(hum)}</b>%`;
@@ -322,12 +348,6 @@ async function indoorAir() {
     setGrade($('#inTile'), g);
     $('#inAir').innerHTML = `${face(g)}<span class="t-grade" style="display:block">${GRADE[g]}</span>
       <span class="t-val" style="display:block">초미세 <b>${Math.round(pm)}</b>${extra}</span>${bar(pm)}`;
-    return true;
-  } catch (e) {
-    const msg = e instanceof TypeError ? 'Home Assistant에 연결하지 못했어요.' : e.message;
-    inOff(`${esc(msg)}<br>눌러서 설정 확인`);
-    return msg;
-  }
 }
 
 /* 설정 화면 */
