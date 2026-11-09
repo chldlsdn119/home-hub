@@ -139,9 +139,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     <form id="haForm" autocomplete="off">
       <label class="field"><span>Home Assistant 주소</span><input id="haUrl" placeholder="http://localhost:8123" inputmode="url"></label>
       <label class="field"><span>장기 액세스 토큰</span><input id="haToken" type="password" placeholder="프로필 → 보안 → 장기 액세스 토큰"></label>
-      <label class="field"><span>초미세먼지(PM2.5) 센서</span><input id="haPm" placeholder="sensor.air_purifier_pm2_5"></label>
-      <label class="field"><span>습도 센서 (선택)</span><input id="haHum" placeholder="sensor.air_purifier_humidity"></label>
-      <label class="field"><span>온도 센서 (선택)</span><input id="haTemp" placeholder="sensor.air_purifier_temperature"></label>
+      <label class="field"><span>초미세먼지(PM2.5) 센서 — 비워 두면 자동으로 찾아요</span><input id="haPm" placeholder="자동으로 찾기"></label>
+      <label class="field"><span>습도 센서 (선택)</span><input id="haHum" placeholder="자동으로 찾기"></label>
+      <label class="field"><span>온도 센서 (선택)</span><input id="haTemp" placeholder="자동으로 찾기"></label>
       <div class="actions">
         <button type="submit" class="pri">저장하고 연결</button>
         <button type="button" id="haClear">연결 지우기</button>
@@ -344,12 +344,37 @@ function openSheet() {
 const closeSheet = () => $('#haSheet').classList.remove('open');
 $('#inTile').addEventListener('click', openSheet);
 document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeSheet));
+// 센서 칸을 비워 두면 Home Assistant에서 초미세먼지·습도·온도 센서를 자동으로 찾기
+async function findSensors() {
+  const r = await fetch(`${ha.url.replace(/\/+$/, '')}/api/states`, { headers: { Authorization: `Bearer ${ha.token}` } });
+  if (r.status === 401) throw new Error('토큰이 맞지 않아요.');
+  if (!r.ok) throw new Error(`응답 오류 (${r.status})`);
+  const all = (await r.json()).filter(s => s.entity_id.startsWith('sensor.'));
+  const byClass = c => all.filter(s => s.attributes && s.attributes.device_class === c);
+  const pm = byClass('pm25')[0];
+  if (!pm) throw new Error('초미세먼지 센서를 찾지 못했어요. 센서 이름을 직접 넣어 주세요.');
+  // 같은 기기(이름 앞부분이 같은 센서)를 먼저 고르기
+  const prefix = pm.entity_id.replace(/_pm2_?5$/, '');
+  const pick = c => (byClass(c).find(s => s.entity_id.startsWith(prefix)) || byClass(c)[0] || {}).entity_id || '';
+  return { pm: pm.entity_id, hum: pick('humidity'), temp: pick('temperature') };
+}
+
 $('#haForm').addEventListener('submit', async e => {
   e.preventDefault();
   ha = { url: $('#haUrl').value.trim(), token: $('#haToken').value.trim(), pm: $('#haPm').value.trim(), hum: $('#haHum').value.trim(), temp: $('#haTemp').value.trim() };
-  if (!ha.url || !ha.token || !ha.pm) { $('#haMsg').textContent = '주소, 토큰, 초미세먼지 센서는 꼭 넣어 주세요.'; return; }
-  save('ha', ha);
+  if (!ha.url || !ha.token) { $('#haMsg').textContent = '주소와 토큰은 꼭 넣어 주세요.'; return; }
   $('#haMsg').textContent = '연결해 보는 중…';
+  if (!ha.pm) {
+    try {
+      const f = await findSensors();
+      ha.pm = f.pm; ha.hum = ha.hum || f.hum; ha.temp = ha.temp || f.temp;
+      $('#haPm').value = ha.pm; $('#haHum').value = ha.hum; $('#haTemp').value = ha.temp;
+    } catch (err) {
+      $('#haMsg').textContent = err instanceof TypeError ? 'Home Assistant에 연결하지 못했어요.' : err.message;
+      return;
+    }
+  }
+  save('ha', ha);
   const ok = await indoorAir();
   if (ok === true) { $('#haMsg').textContent = '연결됐어요.'; setTimeout(closeSheet, 800); }
   else $('#haMsg').textContent = ok;
