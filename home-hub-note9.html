@@ -10,40 +10,56 @@
 <title>우리집 허브</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#E4EBE6;--panel:#D5DFD9;--ink:#1F2A2E;--muted:#55666A;--line:#B9C6BF;--accent:#2F6F8F;--warm:#9C5F17;--warm-bg:#F1E0C6;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000000;--panel:#0E1417;--ink:#D9E2DF;--muted:#7E8F93;--line:#223036;--accent:#86BCD4;--warm:#E6AE60;--warm-bg:#2A1E0E;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#000000;--panel:#0E1417;--ink:#D9E2DF;--muted:#7E8F93;--line:#223036;--accent:#86BCD4;--warm:#E6AE60;--warm-bg:#2A1E0E;color-scheme:dark}
+:root{--bg:#E8EDEA;--panel:#F8FAF9;--ink:#1F2A2E;--muted:#5A6B6F;--line:#C9D3CE;--accent:#2F6F8F;--warm:#9C5F17;--warm-bg:#F1E0C6;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000000;--panel:#14191C;--ink:#E3EAE7;--muted:#8A9A9E;--line:#26333A;--accent:#86BCD4;--warm:#E6AE60;--warm-bg:#2A1E0E;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#000000;--panel:#14191C;--ink:#E3EAE7;--muted:#8A9A9E;--line:#26333A;--accent:#86BCD4;--warm:#E6AE60;--warm-bg:#2A1E0E;color-scheme:dark}
 *,*::before,*::after{box-sizing:inherit}
 html,body{height:100%;margin:0}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans KR",system-ui,-apple-system,"Malgun Gothic",sans-serif;-webkit-tap-highlight-color:transparent;overflow:hidden;transition:background .6s}
-.num{font-family:"Big Shoulders Display","Arial Narrow",sans-serif;font-weight:700;font-variant-numeric:tabular-nums;line-height:.85}
+.num{font-family:"Outfit",system-ui,sans-serif;font-weight:500;font-variant-numeric:tabular-nums;line-height:.85;letter-spacing:-.01em}
 button{font:inherit;color:inherit;background:transparent;border:1.5px solid var(--line);border-radius:999px;padding:0 16px;font-size:15px;cursor:pointer;min-height:44px}
 button:active{transform:scale(.97)}
 button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-.hub{height:100%;display:grid;grid-template-columns:1.55fr 1fr;grid-template-rows:1fr auto;column-gap:5vw;row-gap:3vh;padding:5vh max(5vw,env(safe-area-inset-left,0px)) 4vh max(5vw,env(safe-area-inset-right,0px));transition:transform 2s}
-.clock{display:flex;flex-direction:column;justify-content:center;min-width:0}
-.time{font-size:min(50vh,26vw)}
-.date{font-size:min(7vh,4vw);color:var(--muted);margin-top:.5em}
-.wx{display:flex;flex-direction:column;justify-content:center;min-width:0}
+.hub{height:100%;display:grid;grid-template-rows:1fr auto;row-gap:3.5vh;padding:4vh max(4.5vw,env(safe-area-inset-left,0px)) 4.5vh max(4.5vw,env(safe-area-inset-right,0px));transition:transform 2s}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:3vw;min-height:0;position:relative}
+.clock{display:flex;align-items:baseline;flex-wrap:wrap;column-gap:3.5vw;row-gap:1vh;min-width:0}
+.time{font-size:min(44vh,24vw);font-weight:400;line-height:.78;margin-left:-.04em}
+.date{font-size:min(6.8vh,3.6vw);color:var(--muted)}
+.mode{position:absolute;top:-1vh;right:-8px;color:var(--muted);font-size:13px;border:none;padding:0 8px;min-height:36px}
+
+.cards{display:grid;grid-template-columns:1.55fr 1fr 1fr;gap:12px;height:min(43vh,210px)}
+.card{background:var(--panel);border:none;border-radius:26px;padding:14px 18px;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;text-align:left;font-size:15px;transition:background .3s}
+button.card{align-items:stretch;justify-content:flex-start}
+.lbl{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);min-height:20px}
+.lbl svg{width:18px;height:18px;flex:none}
+.lbl b{margin-left:auto;font-weight:500;color:var(--accent);font-size:14px}
+.card-main{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0}
+
 .wx-now{display:flex;align-items:center;gap:12px}
-.wx-now svg{width:min(15vh,9vw);height:auto;color:var(--accent);flex:none}
-.wx-temp{font-size:min(24vh,12vw)}
-.wx-desc{font-size:min(5.5vh,3vw)}
-.wx-sub{color:var(--muted);font-size:min(4.6vh,2.6vw);margin-top:6px}
-.hours{display:grid;grid-template-columns:repeat(4,1fr);margin-top:3vh;padding-top:2vh;border-top:1.5px solid var(--line);text-align:center}
-.hours svg{width:min(7vh,4vw);height:min(7vh,4vw);color:var(--accent);display:block;margin:4px auto}
-.hours .h{font-size:min(4vh,2.2vw);color:var(--muted)}
-.hours .t{font-size:min(5vh,2.8vw);font-weight:500}
-.wx-off{color:var(--muted);font-size:14px;line-height:1.6;margin:0}
-.bar{grid-column:1/-1;display:flex;gap:10px;align-items:center}
-.bar .sp{flex:1}
-.chip{color:var(--warm);border-color:var(--warm)}
-.chip .num{font-size:20px;margin-left:6px;line-height:1}
-.mode{color:var(--muted);font-size:13px;border:none;padding:0 6px}
+.wx-now svg{width:min(13vh,52px);height:auto;color:var(--accent);flex:none}
+.wx-temp{font-size:min(15vh,62px);font-weight:400}
+.wx-desc{font-size:15px}
+.wx-sub{color:var(--muted);font-size:13px;margin-top:2px}
+.hours{display:grid;grid-template-columns:repeat(4,1fr);text-align:center;padding-top:8px;border-top:1px solid var(--line)}
+.hours svg{width:20px;height:20px;color:var(--accent);display:block;margin:2px auto}
+.hours .h{font-size:12px;color:var(--muted)}
+.hours .t{font-size:14px;font-weight:500}
+.wx-off{color:var(--muted);font-size:13px;line-height:1.5;margin:auto 0}
+
+.mprev{margin:10px 0 0;display:flex;flex-direction:column;gap:6px;min-height:0;overflow:hidden}
+.mprev span{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:14px;position:relative}
+.mprev span::before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.mprev .more,.mprev .hint{color:var(--muted);font-size:14px;padding-left:0}
+.mprev .more::before,.mprev .hint::before{display:none}
+
+.tcard .tval{font-size:min(14vh,56px);color:var(--muted)}
+.tcard .thint{color:var(--muted);font-size:14px;margin-top:8px}
+.tcard.on .tval{color:var(--warm)}
+body.ring .tcard{background:var(--warm-bg)}
 
 .sheet{position:fixed;inset:0;background:var(--bg);display:none;padding:5vh max(5vw,env(safe-area-inset-left,0px)) 4vh max(5vw,env(safe-area-inset-right,0px));z-index:5}
 .sheet.open{display:grid}
@@ -76,11 +92,13 @@ body.ring .tstop{background:var(--warm);color:var(--bg);font-weight:500}
 
 @media (orientation:portrait){
   body{overflow:auto}
-  .hub{grid-template-columns:1fr;grid-template-rows:auto;height:auto;min-height:100%;row-gap:4vh;padding-top:8vh}
-  .time{font-size:30vw}.date{font-size:5.5vw}
-  .wx-now svg{width:16vw}.wx-temp{font-size:20vw}.wx-desc{font-size:5vw}.wx-sub{font-size:4vw}
-  .hours svg{width:8vw;height:8vw}.hours .h{font-size:3.6vw}.hours .t{font-size:4.6vw}
-  .bar{flex-wrap:wrap}
+  .hub{grid-template-rows:auto;height:auto;min-height:100%;row-gap:5vh;padding-top:9vh}
+  .clock{flex-direction:column;align-items:flex-start}
+  .time{font-size:34vw}.date{font-size:5.5vw}
+  .mode{top:-6vh}
+  .cards{grid-template-columns:1fr 1fr;height:auto}
+  .cards .wxc{grid-column:1/-1}
+  .cards .card{min-height:150px}
   #timerSheet{grid-template-columns:1fr;align-content:center;row-gap:5vh}
   .tleft{font-size:34vw}
 }
@@ -88,20 +106,26 @@ body.ring .tstop{background:var(--warm);color:var(--bg);font-weight:500}
 </head>
 <body>
 <main class="hub" id="hub">
-  <section class="clock" aria-label="시계">
-    <div id="time" class="time num">--:--</div>
-    <div id="date" class="date"></div>
-  </section>
-  <section class="wx" id="wx" aria-live="polite" aria-label="날씨">
-    <p class="wx-off">날씨를 불러오는 중이에요.</p>
-  </section>
-  <nav class="bar">
-    <button type="button" id="openTimer">타이머</button>
-    <button type="button" id="chip" class="chip" hidden>남은 시간<span class="num" id="chipT">0:00</span></button>
-    <button type="button" id="openMemo">메모</button>
-    <span class="sp"></span>
+  <div class="top">
+    <section class="clock" aria-label="시계">
+      <div id="time" class="time num">--:--</div>
+      <div id="date" class="date"></div>
+    </section>
     <button type="button" id="themeBtn" class="mode">화면: 자동</button>
-  </nav>
+  </div>
+  <div class="cards">
+    <section class="card wxc" id="wx" aria-live="polite" aria-label="날씨">
+      <p class="wx-off">날씨를 불러오는 중이에요.</p>
+    </section>
+    <button type="button" class="card" id="openMemo" aria-label="메모 열기">
+      <span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg>메모<b id="mcount"></b></span>
+      <span class="mprev" id="mprev"></span>
+    </button>
+    <button type="button" class="card tcard" id="openTimer" aria-label="타이머 열기">
+      <span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M10 2h4"/></svg>타이머</span>
+      <span class="card-main"><span class="tval num" id="chipT">0:00</span><span class="thint" id="thint">눌러서 시작</span></span>
+    </button>
+  </div>
 </main>
 
 <section class="sheet" id="timerSheet" aria-label="타이머">
@@ -207,8 +231,8 @@ async function weather() {
       hours += `<div><div class="h">${Number(j.hourly.time[idx].slice(11, 13))}시</div>${ICON[wmo(j.hourly.weather_code[idx], j.hourly.is_day[idx])[1]]}<div class="t">${Math.round(j.hourly.temperature_2m[idx])}°</div></div>`;
     }
     $('#wx').innerHTML = `
-      <div class="wx-now">${ICON[ic]}<div><div class="wx-temp num">${Math.round(j.current.temperature_2m)}°</div><div class="wx-desc">${desc}</div></div></div>
-      <div class="wx-sub">최고 ${Math.round(j.daily.temperature_2m_max[0])}° 최저 ${Math.round(j.daily.temperature_2m_min[0])}°<br>오늘 비 올 확률 ${Math.round(j.daily.precipitation_probability_max[0] ?? 0)}%</div>
+      <div class="card-main"><div class="wx-now">${ICON[ic]}<div class="wx-temp num">${Math.round(j.current.temperature_2m)}°</div>
+        <div><div class="wx-desc">${desc}</div><div class="wx-sub">최고 ${Math.round(j.daily.temperature_2m_max[0])}° · 최저 ${Math.round(j.daily.temperature_2m_min[0])}°<br>오늘 비 올 확률 ${Math.round(j.daily.precipitation_probability_max[0] ?? 0)}%</div></div></div></div>
       <div class="hours">${hours}</div>`;
   } catch (e) {
     $('#wx').innerHTML = '<p class="wx-off">여기서는 날씨를 불러올 수 없어요. 깃허브 페이지 같은 내 주소에 올려서 열면 실시간 날씨가 보여요.</p>';
@@ -220,7 +244,6 @@ setInterval(weather, 30 * 60 * 1000);
 function openSheet(id) { document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open')); $(id).classList.add('open'); }
 function closeSheets() { document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open')); }
 $('#openTimer').addEventListener('click', () => openSheet('#timerSheet'));
-$('#chip').addEventListener('click', () => openSheet('#timerSheet'));
 $('#openMemo').addEventListener('click', () => { openSheet('#memoSheet'); });
 document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeSheets));
 
@@ -249,7 +272,8 @@ function run() {
   clearInterval(tm); clearInterval(beepInt);
   document.body.classList.remove('ring');
   $('#timerSheet').classList.add('running');
-  $('#chip').hidden = false;
+  $('#openTimer').classList.add('on');
+  $('#thint').textContent = '남은 시간';
   upd(); tm = setInterval(upd, 250);
 }
 function ring() {
@@ -263,8 +287,10 @@ function stopTimer() {
   clearInterval(tm); clearInterval(beepInt); end = 0;
   document.body.classList.remove('ring');
   $('#timerSheet').classList.remove('running');
-  $('#chip').hidden = true;
+  $('#openTimer').classList.remove('on');
+  $('#thint').textContent = '눌러서 시작';
   $('#tleft').textContent = '0:00';
+  $('#chipT').textContent = '0:00';
 }
 document.querySelectorAll('[data-s]').forEach(b => b.addEventListener('click', () => {
   audio(); end = Date.now() + Number(b.dataset.s) * 1000; run(); setTimeout(closeSheets, 600);
@@ -276,7 +302,12 @@ let memos = load('memos') || [];
 function renderMemos() {
   const ul = $('#ml'); ul.innerHTML = '';
   const left = memos.filter(m => !m.d).length;
-  $('#openMemo').textContent = left ? `메모 ${left}` : '메모';
+  $('#mcount').textContent = left ? left : '';
+  const todo = memos.filter(m => !m.d), pv = $('#mprev');
+  pv.innerHTML = '';
+  todo.slice(0, 3).forEach(m => { const s = document.createElement('span'); s.textContent = m.t; pv.append(s); });
+  if (todo.length > 3) pv.insertAdjacentHTML('beforeend', `<span class="more">외 ${todo.length - 3}개</span>`);
+  if (!todo.length) pv.innerHTML = '<span class="hint">눌러서 메모 추가</span>';
   if (!memos.length) { ul.innerHTML = '<li class="empty">장 볼 것, 할 일을 적어 두세요.</li>'; return; }
   memos.forEach((m, i) => {
     const li = document.createElement('li'); if (m.d) li.className = 'done';
