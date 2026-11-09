@@ -1,0 +1,13 @@
+{
+  "name": "우리집 허브",
+  "short_name": "허브",
+  "start_url": "home-hub-note9.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

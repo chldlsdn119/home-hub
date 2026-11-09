@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>우리집 허브</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#E4EBE6;--panel:#D5DFD9;--ink:#1F2A2E;--muted:#55666A;--line:#B9C6BF;--accent:#2F6F8F;--warm:#9C5F17;--warm-bg:#F1E0C6;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000000;--panel:#0E1417;--ink:#D9E2DF;--muted:#7E8F93;--line:#223036;--accent:#86BCD4;--warm:#E6AE60;--warm-bg:#2A1E0E;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#000000;--panel:#0E1417;--ink:#D9E2DF;--muted:#7E8F93;--line:#223036;--accent:#86BCD4;--warm:#E6AE60;--warm-bg:#2A1E0E;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans KR",system-ui,-apple-system,"Malgun Gothic",sans-serif;-webkit-tap-highlight-color:transparent;overflow:hidden;transition:background .6s}
+.num{font-family:"Big Shoulders Display","Arial Narrow",sans-serif;font-weight:700;font-variant-numeric:tabular-nums;line-height:.85}
+button{font:inherit;color:inherit;background:transparent;border:1.5px solid var(--line);border-radius:999px;padding:0 16px;font-size:15px;cursor:pointer;min-height:44px}
+button:active{transform:scale(.97)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.hub{height:100%;display:grid;grid-template-columns:1.55fr 1fr;grid-template-rows:1fr auto;column-gap:5vw;row-gap:3vh;padding:5vh max(5vw,env(safe-area-inset-left,0px)) 4vh max(5vw,env(safe-area-inset-right,0px));transition:transform 2s}
+.clock{display:flex;flex-direction:column;justify-content:center;min-width:0}
+.time{font-size:min(50vh,26vw)}
+.date{font-size:min(7vh,4vw);color:var(--muted);margin-top:.5em}
+.wx{display:flex;flex-direction:column;justify-content:center;min-width:0}
+.wx-now{display:flex;align-items:center;gap:12px}
+.wx-now svg{width:min(15vh,9vw);height:auto;color:var(--accent);flex:none}
+.wx-temp{font-size:min(24vh,12vw)}
+.wx-desc{font-size:min(5.5vh,3vw)}
+.wx-sub{color:var(--muted);font-size:min(4.6vh,2.6vw);margin-top:6px}
+.hours{display:grid;grid-template-columns:repeat(4,1fr);margin-top:3vh;padding-top:2vh;border-top:1.5px solid var(--line);text-align:center}
+.hours svg{width:min(7vh,4vw);height:min(7vh,4vw);color:var(--accent);display:block;margin:4px auto}
+.hours .h{font-size:min(4vh,2.2vw);color:var(--muted)}
+.hours .t{font-size:min(5vh,2.8vw);font-weight:500}
+.wx-off{color:var(--muted);font-size:14px;line-height:1.6;margin:0}
+.bar{grid-column:1/-1;display:flex;gap:10px;align-items:center}
+.bar .sp{flex:1}
+.chip{color:var(--warm);border-color:var(--warm)}
+.chip .num{font-size:20px;margin-left:6px;line-height:1}
+.mode{color:var(--muted);font-size:13px;border:none;padding:0 6px}
+
+.sheet{position:fixed;inset:0;background:var(--bg);display:none;padding:5vh max(5vw,env(safe-area-inset-left,0px)) 4vh max(5vw,env(safe-area-inset-right,0px));z-index:5}
+.sheet.open{display:grid}
+.close{position:absolute;top:max(3vh,env(safe-area-inset-top,0px));right:max(4vw,env(safe-area-inset-right,0px))}
+.sheet h2{font-size:15px;font-weight:500;color:var(--muted);margin:0 0 8px}
+
+#timerSheet{grid-template-columns:1.2fr 1fr;column-gap:5vw;align-items:center}
+.tleft{font-size:min(48vh,24vw);color:var(--muted)}
+.running .tleft{color:var(--ink)}
+.tbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tbtns button{min-height:min(15vh,64px);font-size:18px;border-radius:18px}
+.tstop{grid-column:1/-1;display:none;border-color:var(--warm);color:var(--warm)}
+.running .tstop{display:block}
+body.ring #timerSheet{background:var(--warm-bg)}
+body.ring .tleft{color:var(--warm);animation:pulse 1s ease-in-out infinite}
+body.ring .tstop{background:var(--warm);color:var(--bg);font-weight:500}
+@keyframes pulse{50%{opacity:.6}}
+@media (prefers-reduced-motion:reduce){body.ring .tleft{animation:none}.hub{transition:none}}
+
+#memoSheet{grid-template-rows:auto auto 1fr;max-width:720px;margin:0 auto}
+#memoSheet form{display:flex;gap:8px;margin:0 70px 12px 0}
+#memoSheet input{flex:1;min-width:0;font:inherit;font-size:17px;color:var(--ink);background:transparent;border:none;border-bottom:1.5px solid var(--line);padding:8px 2px}
+#memoSheet input::placeholder{color:var(--muted)}
+#ml{list-style:none;margin:0;padding:0;overflow:auto;min-height:0}
+#ml li{display:flex;align-items:center;gap:10px;padding:10px 0;font-size:18px;border-bottom:1px solid var(--line)}
+#ml li span{flex:1;cursor:pointer;overflow-wrap:anywhere}
+#ml li.done span{color:var(--muted);text-decoration:line-through}
+#ml li button{border:none;min-height:36px;padding:0 10px;color:var(--muted);font-size:14px}
+#ml .empty{color:var(--muted);font-size:15px;border:none}
+
+@media (orientation:portrait){
+  body{overflow:auto}
+  .hub{grid-template-columns:1fr;grid-template-rows:auto;height:auto;min-height:100%;row-gap:4vh;padding-top:8vh}
+  .time{font-size:30vw}.date{font-size:5.5vw}
+  .wx-now svg{width:16vw}.wx-temp{font-size:20vw}.wx-desc{font-size:5vw}.wx-sub{font-size:4vw}
+  .hours svg{width:8vw;height:8vw}.hours .h{font-size:3.6vw}.hours .t{font-size:4.6vw}
+  .bar{flex-wrap:wrap}
+  #timerSheet{grid-template-columns:1fr;align-content:center;row-gap:5vh}
+  .tleft{font-size:34vw}
+}
+</style>
+</head>
+<body>
+<main class="hub" id="hub">
+  <section class="clock" aria-label="시계">
+    <div id="time" class="time num">--:--</div>
+    <div id="date" class="date"></div>
+  </section>
+  <section class="wx" id="wx" aria-live="polite" aria-label="날씨">
+    <p class="wx-off">날씨를 불러오는 중이에요.</p>
+  </section>
+  <nav class="bar">
+    <button type="button" id="openTimer">타이머</button>
+    <button type="button" id="chip" class="chip" hidden>남은 시간<span class="num" id="chipT">0:00</span></button>
+    <button type="button" id="openMemo">메모</button>
+    <span class="sp"></span>
+    <button type="button" id="themeBtn" class="mode">화면: 자동</button>
+  </nav>
+</main>
+
+<section class="sheet" id="timerSheet" aria-label="타이머">
+  <button type="button" class="close" data-close>닫기</button>
+  <div>
+    <h2>타이머</h2>
+    <div id="tleft" class="tleft num">0:00</div>
+  </div>
+  <div class="tbtns">
+    <button type="button" data-s="60">1분</button>
+    <button type="button" data-s="180">3분</button>
+    <button type="button" data-s="300">5분</button>
+    <button type="button" data-s="600">10분</button>
+    <button type="button" data-s="900">15분</button>
+    <button type="button" id="plus">+1분</button>
+    <button type="button" id="stop" class="tstop">멈추기</button>
+  </div>
+</section>
+
+<section class="sheet" id="memoSheet" aria-label="메모">
+  <button type="button" class="close" data-close>닫기</button>
+  <h2>메모</h2>
+  <form id="mf">
+    <input id="mi" placeholder="우유 사 오기" maxlength="60" autocomplete="off" aria-label="메모 입력">
+    <button type="submit">추가</button>
+  </form>
+  <ul id="ml"></ul>
+</section>
+
+<script>
+const LAT = 37.6, LON = 127.3;
+const $ = s => document.querySelector(s);
+const load = k => { try { return JSON.parse(localStorage.getItem('hub-' + k)); } catch (e) { return null; } };
+const save = (k, v) => { try { localStorage.setItem('hub-' + k, JSON.stringify(v)); } catch (e) {} };
+const DAYS = ['일','월','화','수','목','금','토'];
+
+let mode = load('mode') || 'dark';
+function applyTheme() {
+  const h = new Date().getHours(), r = document.documentElement;
+  if (mode === 'light') r.dataset.theme = 'light';
+  else if (mode === 'dark') r.dataset.theme = 'dark';
+  else if (h >= 22 || h < 7) r.dataset.theme = 'dark';
+  else delete r.dataset.theme;
+  $('#themeBtn').textContent = { auto: '화면: 자동', light: '화면: 밝게', dark: '화면: 어둡게' }[mode];
+}
+$('#themeBtn').addEventListener('click', () => {
+  mode = { dark: 'auto', auto: 'light', light: 'dark' }[mode];
+  save('mode', mode); applyTheme();
+});
+
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function shift() {
+  const x = Math.round(Math.random() * 12 - 6), y = Math.round(Math.random() * 8 - 4);
+  $('#hub').style.transform = `translate(${x}px, ${y}px)`;
+}
+
+function tick() {
+  const d = new Date();
+  $('#time').textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  $('#date').textContent = `${d.getMonth() + 1}월 ${d.getDate()}일 ${DAYS[d.getDay()]}요일`;
+  applyTheme();
+  if (d.getMinutes() % 3 === 0) shift();
+}
+tick();
+setTimeout(() => { tick(); setInterval(tick, 60000); }, (60 - new Date().getSeconds()) * 1000);
+
+const S = 'fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"';
+const C2 = '<path d="M7 15h10a4 4 0 0 0 .4-7.98A6 6 0 0 0 6.2 6.6 4.2 4.2 0 0 0 7 15z"/>';
+const ICON = {
+  sun: `<svg viewBox="0 0 24 24" ${S}><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg>`,
+  partly: `<svg viewBox="0 0 24 24" ${S}><circle cx="8" cy="8" r="3"/><path d="M8 2.5v1.2M2.5 8h1.2M4.1 4.1l.9.9M11.9 4.1l-.9.9"/><path d="M9 20h8a3.5 3.5 0 0 0 .3-6.98A5 5 0 0 0 8.2 12.3 3.8 3.8 0 0 0 9 20z"/></svg>`,
+  cloud: `<svg viewBox="0 0 24 24" ${S}><path d="M7 18h10a4 4 0 0 0 .4-7.98A6 6 0 0 0 6.2 9.6 4.2 4.2 0 0 0 7 18z"/></svg>`,
+  fog: `<svg viewBox="0 0 24 24" ${S}><path d="M4 9h16M3 13h18M5 17h14"/></svg>`,
+  rain: `<svg viewBox="0 0 24 24" ${S}>${C2}<path d="M8 18l-1 2.5M12 18l-1 2.5M16 18l-1 2.5"/></svg>`,
+  snow: `<svg viewBox="0 0 24 24" ${S}>${C2}<path d="M8 19h.01M12 20.5h.01M16 19h.01"/></svg>`,
+  storm: `<svg viewBox="0 0 24 24" ${S}>${C2}<path d="M12.5 16l-2 3h3l-2 3"/></svg>`
+};
+function wmo(c) {
+  if (c === 0) return ['맑음', 'sun'];
+  if (c <= 2) return ['구름 조금', 'partly'];
+  if (c === 3) return ['흐림', 'cloud'];
+  if (c <= 48) return ['안개', 'fog'];
+  if (c <= 67 || (c >= 80 && c <= 82)) return ['비', 'rain'];
+  if (c <= 77 || c === 85 || c === 86) return ['눈', 'snow'];
+  return ['뇌우', 'storm'];
+}
+async function weather() {
+  try {
+    const u = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code&hourly=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=2`;
+    const r = await fetch(u);
+    if (!r.ok) throw new Error('bad');
+    const j = await r.json();
+    const [desc, ic] = wmo(j.current.weather_code);
+    const now = j.current.time.slice(0, 13);
+    let i = j.hourly.time.findIndex(t => t.slice(0, 13) === now);
+    if (i < 0) i = 0;
+    let hours = '';
+    for (let k = 1; k <= 4; k++) {
+      const idx = i + k * 2;
+      if (idx >= j.hourly.time.length) break;
+      hours += `<div><div class="h">${Number(j.hourly.time[idx].slice(11, 13))}시</div>${ICON[wmo(j.hourly.weather_code[idx])[1]]}<div class="t">${Math.round(j.hourly.temperature_2m[idx])}°</div></div>`;
+    }
+    $('#wx').innerHTML = `
+      <div class="wx-now">${ICON[ic]}<div><div class="wx-temp num">${Math.round(j.current.temperature_2m)}°</div><div class="wx-desc">${desc}</div></div></div>
+      <div class="wx-sub">최고 ${Math.round(j.daily.temperature_2m_max[0])}° 최저 ${Math.round(j.daily.temperature_2m_min[0])}° · 비 ${Math.round(j.daily.precipitation_probability_max[0] ?? 0)}%</div>
+      <div class="hours">${hours}</div>`;
+  } catch (e) {
+    $('#wx').innerHTML = '<p class="wx-off">여기서는 날씨를 불러올 수 없어요. 깃허브 페이지 같은 내 주소에 올려서 열면 실시간 날씨가 보여요.</p>';
+  }
+}
+weather();
+setInterval(weather, 30 * 60 * 1000);
+
+function openSheet(id) { document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open')); $(id).classList.add('open'); }
+function closeSheets() { document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open')); }
+$('#openTimer').addEventListener('click', () => openSheet('#timerSheet'));
+$('#chip').addEventListener('click', () => openSheet('#timerSheet'));
+$('#openMemo').addEventListener('click', () => { openSheet('#memoSheet'); });
+document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeSheets));
+
+let end = 0, tm = null, beepInt = null, ac = null;
+function audio() {
+  try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch (e) { ac = null; }
+}
+function beep() {
+  if (!ac) return;
+  const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime;
+  o.frequency.value = 880;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.35, t + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.4);
+  o.connect(g).connect(ac.destination);
+  o.start(t); o.stop(t + 0.45);
+}
+const fmt = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+function upd() {
+  const left = Math.max(0, Math.round((end - Date.now()) / 1000));
+  $('#tleft').textContent = fmt(left);
+  $('#chipT').textContent = fmt(left);
+  if (left <= 0) { clearInterval(tm); ring(); }
+}
+function run() {
+  clearInterval(tm); clearInterval(beepInt);
+  document.body.classList.remove('ring');
+  $('#timerSheet').classList.add('running');
+  $('#chip').hidden = false;
+  upd(); tm = setInterval(upd, 250);
+}
+function ring() {
+  if (document.body.classList.contains('ring')) return;
+  document.body.classList.add('ring');
+  openSheet('#timerSheet');
+  beep(); beepInt = setInterval(beep, 900);
+  try { navigator.vibrate && navigator.vibrate([400, 200, 400]); } catch (e) {}
+}
+function stopTimer() {
+  clearInterval(tm); clearInterval(beepInt); end = 0;
+  document.body.classList.remove('ring');
+  $('#timerSheet').classList.remove('running');
+  $('#chip').hidden = true;
+  $('#tleft').textContent = '0:00';
+}
+document.querySelectorAll('[data-s]').forEach(b => b.addEventListener('click', () => {
+  audio(); end = Date.now() + Number(b.dataset.s) * 1000; run(); setTimeout(closeSheets, 600);
+}));
+$('#plus').addEventListener('click', () => { audio(); end = (end > Date.now() ? end : Date.now()) + 60000; run(); });
+$('#stop').addEventListener('click', () => { stopTimer(); closeSheets(); });
+
+let memos = load('memos') || [];
+function renderMemos() {
+  const ul = $('#ml'); ul.innerHTML = '';
+  const left = memos.filter(m => !m.d).length;
+  $('#openMemo').textContent = left ? `메모 ${left}` : '메모';
+  if (!memos.length) { ul.innerHTML = '<li class="empty">장 볼 것, 할 일을 적어 두세요.</li>'; return; }
+  memos.forEach((m, i) => {
+    const li = document.createElement('li'); if (m.d) li.className = 'done';
+    const sp = document.createElement('span'); sp.textContent = m.t;
+    sp.addEventListener('click', () => { memos[i].d = !memos[i].d; save('memos', memos); renderMemos(); });
+    const del = document.createElement('button'); del.type = 'button'; del.textContent = '지우기';
+    del.addEventListener('click', () => { memos.splice(i, 1); save('memos', memos); renderMemos(); });
+    li.append(sp, del); ul.append(li);
+  });
+}
+$('#mf').addEventListener('submit', e => {
+  e.preventDefault();
+  const v = $('#mi').value.trim(); if (!v) return;
+  memos.unshift({ t: v, d: false }); save('memos', memos); $('#mi').value = ''; renderMemos();
+});
+renderMemos();
+
+let lock = null;
+async function keepAwake() {
+  try { if ('wakeLock' in navigator && !lock) { lock = await navigator.wakeLock.request('screen'); lock.addEventListener('release', () => { lock = null; }); } } catch (e) {}
+}
+document.addEventListener('click', keepAwake);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { keepAwake(); weather(); } });
+</script>
+</body>
+</html>
