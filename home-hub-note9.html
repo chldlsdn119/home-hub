@@ -12,9 +12,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#E8EDEA;--panel:#F8FAF9;--ink:#1F2A2E;--muted:#5A6B6F;--line:#C9D3CE;--accent:#2F6F8F;--warm:#9C5F17;--warm-bg:#F1E0C6;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000000;--panel:#14191C;--ink:#E3EAE7;--muted:#8A9A9E;--line:#26333A;--accent:#86BCD4;--warm:#E6AE60;--warm-bg:#2A1E0E;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#000000;--panel:#14191C;--ink:#E3EAE7;--muted:#8A9A9E;--line:#26333A;--accent:#86BCD4;--warm:#E6AE60;--warm-bg:#2A1E0E;color-scheme:dark}
+:root{--bg:#E8EDEA;--panel:#F8FAF9;--ink:#1F2A2E;--muted:#5A6B6F;--line:#C9D3CE;--accent:#2F6F8F;--g0:#1F6FB8;--g1:#2E8540;--g2:#C2610E;--g3:#C0392B;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000000;--panel:#14191C;--ink:#E3EAE7;--muted:#8A9A9E;--line:#26333A;--accent:#86BCD4;--g0:#6FB1EE;--g1:#6CC584;--g2:#F0A54A;--g3:#F07A6E;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#000000;--panel:#14191C;--ink:#E3EAE7;--muted:#8A9A9E;--line:#26333A;--accent:#86BCD4;--g0:#6FB1EE;--g1:#6CC584;--g2:#F0A54A;--g3:#F07A6E;color-scheme:dark}
 *,*::before,*::after{box-sizing:inherit}
 html,body{height:100%;margin:0}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
@@ -32,11 +32,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .mode{position:absolute;top:-1vh;right:-8px;color:var(--muted);font-size:13px;border:none;padding:0 8px;min-height:36px}
 
 .cards{display:grid;grid-template-columns:1.55fr 1fr 1fr;gap:12px;height:min(43vh,210px)}
-.card{background:var(--panel);border:none;border-radius:26px;padding:14px 18px;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;text-align:left;font-size:15px;transition:background .3s}
+.card{background:var(--panel);border:none;border-radius:26px;padding:14px 18px;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;text-align:left;font-size:15px}
 button.card{align-items:stretch;justify-content:flex-start}
 .lbl{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);min-height:20px}
 .lbl svg{width:18px;height:18px;flex:none}
-.lbl b{margin-left:auto;font-weight:500;color:var(--accent);font-size:14px}
 .card-main{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0}
 
 .wx-now{display:flex;align-items:center;gap:12px}
@@ -48,48 +47,33 @@ button.card{align-items:stretch;justify-content:flex-start}
 .hours svg{width:20px;height:20px;color:var(--accent);display:block;margin:2px auto}
 .hours .h{font-size:12px;color:var(--muted)}
 .hours .t{font-size:14px;font-weight:500}
-.wx-off{color:var(--muted);font-size:13px;line-height:1.5;margin:auto 0}
+.off{color:var(--muted);font-size:13px;line-height:1.5;margin:auto 0}
 
-.mprev{margin:10px 0 0;display:flex;flex-direction:column;gap:6px;min-height:0;overflow:hidden}
-.mprev span{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:14px;position:relative}
-.mprev span::before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
-.mprev .more,.mprev .hint{color:var(--muted);font-size:14px;padding-left:0}
-.mprev .more::before,.mprev .hint::before{display:none}
+.aq-grade{display:flex;align-items:center;gap:10px;font-size:min(8vh,32px);font-weight:500;line-height:1.1}
+.aq-grade::before{content:"";width:.42em;height:.42em;border-radius:50%;background:currentColor;flex:none}
+.g0{color:var(--g0)}.g1{color:var(--g1)}.g2{color:var(--g2)}.g3{color:var(--g3)}
+.aq-rows{margin-top:10px;display:grid;gap:4px}
+.aq-rows>*{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:14px;color:var(--muted)}
+.aq-rows b{font-family:"Outfit",system-ui,sans-serif;font-weight:500;font-size:18px;color:var(--ink)}
+.aq-rows .g0{color:var(--g0)}.aq-rows .g1{color:var(--g1)}.aq-rows .g2{color:var(--g2)}.aq-rows .g3{color:var(--g3)}
+.aq-rows small{font-size:11px;color:var(--muted);margin-left:2px}
+.aq-note{margin-top:8px;font-size:13px;color:var(--muted)}
+.aq-note.warn{color:var(--g2)}
 
-.tcard .tval{font-size:min(14vh,56px);color:var(--muted)}
-.tcard .thint{color:var(--muted);font-size:14px;margin-top:8px}
-.tcard.on .tval{color:var(--warm)}
-body.ring .tcard{background:var(--warm-bg)}
-
-.sheet{position:fixed;inset:0;background:var(--bg);display:none;padding:5vh max(5vw,env(safe-area-inset-left,0px)) 4vh max(5vw,env(safe-area-inset-right,0px));z-index:5}
-.sheet.open{display:grid}
+.sheet{position:fixed;inset:0;background:var(--bg);display:none;overflow:auto;padding:5vh max(5vw,env(safe-area-inset-left,0px)) 4vh max(5vw,env(safe-area-inset-right,0px));z-index:5}
+.sheet.open{display:block}
+.sheet-in{max-width:620px;margin:0 auto}
 .close{position:absolute;top:max(3vh,env(safe-area-inset-top,0px));right:max(4vw,env(safe-area-inset-right,0px))}
-.sheet h2{font-size:15px;font-weight:500;color:var(--muted);margin:0 0 8px}
+.sheet h2{font-size:18px;font-weight:500;margin:0 0 4px}
+.sheet p{color:var(--muted);font-size:14px;line-height:1.6;margin:0 90px 14px 0}
+.field{display:block;margin-bottom:12px}
+.field span{display:block;font-size:13px;color:var(--muted);margin-bottom:2px}
+.field input{width:100%;font:inherit;font-size:16px;color:var(--ink);background:transparent;border:none;border-bottom:1.5px solid var(--line);padding:6px 2px}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.actions .pri{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:500}
+#haMsg{font-size:14px;color:var(--muted)}
 
-#timerSheet{grid-template-columns:1.2fr 1fr;column-gap:5vw;align-items:center}
-.tleft{font-size:min(48vh,24vw);color:var(--muted)}
-.running .tleft{color:var(--ink)}
-.tbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.tbtns button{min-height:min(15vh,64px);font-size:18px;border-radius:18px}
-.tstop{grid-column:1/-1;display:none;border-color:var(--warm);color:var(--warm)}
-.running .tstop{display:block}
-body.ring #timerSheet{background:var(--warm-bg)}
-body.ring .tleft{color:var(--warm);animation:pulse 1s ease-in-out infinite}
-body.ring .tstop{background:var(--warm);color:var(--bg);font-weight:500}
-@keyframes pulse{50%{opacity:.6}}
-@media (prefers-reduced-motion:reduce){body.ring .tleft{animation:none}.hub{transition:none}}
-
-#memoSheet{grid-template-rows:auto auto 1fr;max-width:720px;margin:0 auto}
-#memoSheet form{display:flex;gap:8px;margin:0 70px 12px 0}
-#memoSheet input{flex:1;min-width:0;font:inherit;font-size:17px;color:var(--ink);background:transparent;border:none;border-bottom:1.5px solid var(--line);padding:8px 2px}
-#memoSheet input::placeholder{color:var(--muted)}
-#ml{list-style:none;margin:0;padding:0;overflow:auto;min-height:0}
-#ml li{display:flex;align-items:center;gap:10px;padding:10px 0;font-size:18px;border-bottom:1px solid var(--line)}
-#ml li span{flex:1;cursor:pointer;overflow-wrap:anywhere}
-#ml li.done span{color:var(--muted);text-decoration:line-through}
-#ml li button{border:none;min-height:36px;padding:0 10px;color:var(--muted);font-size:14px}
-#ml .empty{color:var(--muted);font-size:15px;border:none}
-
+@media (prefers-reduced-motion:reduce){.hub{transition:none}}
 @media (orientation:portrait){
   body{overflow:auto}
   .hub{grid-template-rows:auto;height:auto;min-height:100%;row-gap:5vh;padding-top:9vh}
@@ -98,9 +82,7 @@ body.ring .tstop{background:var(--warm);color:var(--bg);font-weight:500}
   .mode{top:-6vh}
   .cards{grid-template-columns:1fr 1fr;height:auto}
   .cards .wxc{grid-column:1/-1}
-  .cards .card{min-height:150px}
-  #timerSheet{grid-template-columns:1fr;align-content:center;row-gap:5vh}
-  .tleft{font-size:34vw}
+  .cards .card{min-height:160px}
 }
 </style>
 </head>
@@ -115,44 +97,37 @@ body.ring .tstop{background:var(--warm);color:var(--bg);font-weight:500}
   </div>
   <div class="cards">
     <section class="card wxc" id="wx" aria-live="polite" aria-label="날씨">
-      <p class="wx-off">날씨를 불러오는 중이에요.</p>
+      <p class="off">날씨를 불러오는 중이에요.</p>
     </section>
-    <button type="button" class="card" id="openMemo" aria-label="메모 열기">
-      <span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg>메모<b id="mcount"></b></span>
-      <span class="mprev" id="mprev"></span>
-    </button>
-    <button type="button" class="card tcard" id="openTimer" aria-label="타이머 열기">
-      <span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M10 2h4"/></svg>타이머</span>
-      <span class="card-main"><span class="tval num" id="chipT">0:00</span><span class="thint" id="thint">눌러서 시작</span></span>
+    <section class="card" aria-label="바깥 공기">
+      <span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h8"/></svg>바깥 공기</span>
+      <div class="card-main" id="outAir"><p class="off">미세먼지를 불러오는 중이에요.</p></div>
+    </section>
+    <button type="button" class="card" id="inCard" aria-label="실내 공기, 눌러서 공기청정기 연결 설정">
+      <span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 15h6M9 18h4"/></svg>실내 공기</span>
+      <span class="card-main" id="inAir"><span class="off">공기청정기 연결 전이에요.<br>눌러서 설정</span></span>
     </button>
   </div>
 </main>
 
-<section class="sheet" id="timerSheet" aria-label="타이머">
+<section class="sheet" id="haSheet" aria-label="공기청정기 연결">
   <button type="button" class="close" data-close>닫기</button>
-  <div>
-    <h2>타이머</h2>
-    <div id="tleft" class="tleft num">0:00</div>
+  <div class="sheet-in">
+    <h2>공기청정기 연결 (Home Assistant)</h2>
+    <p>Home Assistant에 연결한 공기청정기의 센서 값을 가져와요. 입력한 값은 이 기기에만 저장되고 깃허브에는 올라가지 않아요.</p>
+    <form id="haForm" autocomplete="off">
+      <label class="field"><span>Home Assistant 주소</span><input id="haUrl" placeholder="http://localhost:8123" inputmode="url"></label>
+      <label class="field"><span>장기 액세스 토큰</span><input id="haToken" type="password" placeholder="프로필 → 보안 → 장기 액세스 토큰"></label>
+      <label class="field"><span>초미세먼지(PM2.5) 센서</span><input id="haPm" placeholder="sensor.air_purifier_pm2_5"></label>
+      <label class="field"><span>습도 센서 (선택)</span><input id="haHum" placeholder="sensor.air_purifier_humidity"></label>
+      <label class="field"><span>온도 센서 (선택)</span><input id="haTemp" placeholder="sensor.air_purifier_temperature"></label>
+      <div class="actions">
+        <button type="submit" class="pri">저장하고 연결</button>
+        <button type="button" id="haClear">연결 지우기</button>
+        <span id="haMsg" aria-live="polite"></span>
+      </div>
+    </form>
   </div>
-  <div class="tbtns">
-    <button type="button" data-s="60">1분</button>
-    <button type="button" data-s="180">3분</button>
-    <button type="button" data-s="300">5분</button>
-    <button type="button" data-s="600">10분</button>
-    <button type="button" data-s="900">15분</button>
-    <button type="button" id="plus">+1분</button>
-    <button type="button" id="stop" class="tstop">멈추기</button>
-  </div>
-</section>
-
-<section class="sheet" id="memoSheet" aria-label="메모">
-  <button type="button" class="close" data-close>닫기</button>
-  <h2>메모</h2>
-  <form id="mf">
-    <input id="mi" placeholder="우유 사 오기" maxlength="60" autocomplete="off" aria-label="메모 입력">
-    <button type="submit">추가</button>
-  </form>
-  <ul id="ml"></ul>
 </section>
 
 <script>
@@ -160,8 +135,10 @@ const LAT = 37.6, LON = 127.3;
 const $ = s => document.querySelector(s);
 const load = k => { try { return JSON.parse(localStorage.getItem('hub-' + k)); } catch (e) { return null; } };
 const save = (k, v) => { try { localStorage.setItem('hub-' + k, JSON.stringify(v)); } catch (e) {} };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const DAYS = ['일','월','화','수','목','금','토'];
 
+/* 화면 모드 */
 let mode = load('mode') || 'dark';
 function applyTheme() {
   const h = new Date().getHours(), r = document.documentElement;
@@ -176,12 +153,11 @@ $('#themeBtn').addEventListener('click', () => {
   save('mode', mode); applyTheme();
 });
 
-const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* 시계 + 번인 방지 */
 function shift() {
   const x = Math.round(Math.random() * 12 - 6), y = Math.round(Math.random() * 8 - 4);
   $('#hub').style.transform = `translate(${x}px, ${y}px)`;
 }
-
 function tick() {
   const d = new Date();
   $('#time').textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
@@ -192,6 +168,7 @@ function tick() {
 tick();
 setTimeout(() => { tick(); setInterval(tick, 60000); }, (60 - new Date().getSeconds()) * 1000);
 
+/* 날씨 */
 const S = 'fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"';
 const C2 = '<path d="M7 15h10a4 4 0 0 0 .4-7.98A6 6 0 0 0 6.2 6.6 4.2 4.2 0 0 0 7 15z"/>';
 const ICON = {
@@ -216,7 +193,7 @@ function wmo(c, day = 1) {
 }
 async function weather() {
   try {
-    const u = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,is_day&hourly=temperature_2m,weather_code,is_day&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=2`;
+    const u = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weather_code,is_day&hourly=temperature_2m,weather_code,is_day&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=2`;
     const r = await fetch(u);
     if (!r.ok) throw new Error('bad');
     const j = await r.json();
@@ -235,102 +212,124 @@ async function weather() {
         <div><div class="wx-desc">${desc}</div><div class="wx-sub">최고 ${Math.round(j.daily.temperature_2m_max[0])}° · 최저 ${Math.round(j.daily.temperature_2m_min[0])}°<br>오늘 비 올 확률 ${Math.round(j.daily.precipitation_probability_max[0] ?? 0)}%</div></div></div></div>
       <div class="hours">${hours}</div>`;
   } catch (e) {
-    $('#wx').innerHTML = '<p class="wx-off">여기서는 날씨를 불러올 수 없어요. 깃허브 페이지 같은 내 주소에 올려서 열면 실시간 날씨가 보여요.</p>';
+    $('#wx').innerHTML = '<p class="off">날씨를 불러오지 못했어요. 잠시 뒤 다시 시도해요.</p>';
   }
 }
-weather();
-setInterval(weather, 30 * 60 * 1000);
 
-function openSheet(id) { document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open')); $(id).classList.add('open'); }
-function closeSheets() { document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open')); }
-$('#openTimer').addEventListener('click', () => openSheet('#timerSheet'));
-$('#openMemo').addEventListener('click', () => { openSheet('#memoSheet'); });
-document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeSheets));
+/* 미세먼지 등급 (환경부 기준, ㎍/㎥) */
+const GRADE = ['좋음', '보통', '나쁨', '매우 나쁨'];
+const CUT = { pm10: [30, 80, 150], pm25: [15, 35, 75] };
+const grade = (v, cut) => { const i = cut.findIndex(x => v <= x); return i < 0 ? 3 : i; };
 
-let end = 0, tm = null, beepInt = null, ac = null;
-function audio() {
-  try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch (e) { ac = null; }
+async function outdoorAir() {
+  try {
+    const u = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${LAT}&longitude=${LON}&current=pm10,pm2_5&hourly=pm10,pm2_5&timezone=Asia%2FSeoul&forecast_days=2`;
+    const r = await fetch(u);
+    if (!r.ok) throw new Error('bad');
+    const j = await r.json();
+    const p10 = Math.round(j.current.pm10), p25 = Math.round(j.current.pm2_5);
+    const g10 = grade(p10, CUT.pm10), g25 = grade(p25, CUT.pm25), g = Math.max(g10, g25);
+    // 앞으로 6시간 안에 지금보다 나빠지면 알려 주기
+    const now = j.current.time.slice(0, 13);
+    let i = j.hourly.time.findIndex(t => t.slice(0, 13) === now), note = '';
+    if (i >= 0) {
+      for (let k = 1; k <= 6 && i + k < j.hourly.time.length; k++) {
+        const hg = Math.max(grade(j.hourly.pm10[i + k], CUT.pm10), grade(j.hourly.pm2_5[i + k], CUT.pm25));
+        if (hg > g) { note = `<div class="aq-note warn">${Number(j.hourly.time[i + k].slice(11, 13))}시쯤 ${GRADE[hg]}</div>`; break; }
+      }
+    }
+    $('#outAir').innerHTML = `
+      <div class="aq-grade g${g}">${GRADE[g]}</div>
+      <div class="aq-rows">
+        <div>미세먼지<span><b class="g${g10}">${p10}</b><small>㎍/㎥</small></span></div>
+        <div>초미세먼지<span><b class="g${g25}">${p25}</b><small>㎍/㎥</small></span></div>
+      </div>${note}`;
+  } catch (e) {
+    $('#outAir').innerHTML = '<p class="off">미세먼지를 불러오지 못했어요.</p>';
+  }
 }
-function beep() {
-  if (!ac) return;
-  const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime;
-  o.frequency.value = 880;
-  g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(0.35, t + 0.02);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.4);
-  o.connect(g).connect(ac.destination);
-  o.start(t); o.stop(t + 0.45);
-}
-const fmt = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-function upd() {
-  const left = Math.max(0, Math.round((end - Date.now()) / 1000));
-  $('#tleft').textContent = fmt(left);
-  $('#chipT').textContent = fmt(left);
-  if (left <= 0) { clearInterval(tm); ring(); }
-}
-function run() {
-  clearInterval(tm); clearInterval(beepInt);
-  document.body.classList.remove('ring');
-  $('#timerSheet').classList.add('running');
-  $('#openTimer').classList.add('on');
-  $('#thint').textContent = '남은 시간';
-  upd(); tm = setInterval(upd, 250);
-}
-function ring() {
-  if (document.body.classList.contains('ring')) return;
-  document.body.classList.add('ring');
-  openSheet('#timerSheet');
-  beep(); beepInt = setInterval(beep, 900);
-  try { navigator.vibrate && navigator.vibrate([400, 200, 400]); } catch (e) {}
-}
-function stopTimer() {
-  clearInterval(tm); clearInterval(beepInt); end = 0;
-  document.body.classList.remove('ring');
-  $('#timerSheet').classList.remove('running');
-  $('#openTimer').classList.remove('on');
-  $('#thint').textContent = '눌러서 시작';
-  $('#tleft').textContent = '0:00';
-  $('#chipT').textContent = '0:00';
-}
-document.querySelectorAll('[data-s]').forEach(b => b.addEventListener('click', () => {
-  audio(); end = Date.now() + Number(b.dataset.s) * 1000; run(); setTimeout(closeSheets, 600);
-}));
-$('#plus').addEventListener('click', () => { audio(); end = (end > Date.now() ? end : Date.now()) + 60000; run(); });
-$('#stop').addEventListener('click', () => { stopTimer(); closeSheets(); });
 
-let memos = load('memos') || [];
-function renderMemos() {
-  const ul = $('#ml'); ul.innerHTML = '';
-  const left = memos.filter(m => !m.d).length;
-  $('#mcount').textContent = left ? left : '';
-  const todo = memos.filter(m => !m.d), pv = $('#mprev');
-  pv.innerHTML = '';
-  todo.slice(0, 3).forEach(m => { const s = document.createElement('span'); s.textContent = m.t; pv.append(s); });
-  if (todo.length > 3) pv.insertAdjacentHTML('beforeend', `<span class="more">외 ${todo.length - 3}개</span>`);
-  if (!todo.length) pv.innerHTML = '<span class="hint">눌러서 메모 추가</span>';
-  if (!memos.length) { ul.innerHTML = '<li class="empty">장 볼 것, 할 일을 적어 두세요.</li>'; return; }
-  memos.forEach((m, i) => {
-    const li = document.createElement('li'); if (m.d) li.className = 'done';
-    const sp = document.createElement('span'); sp.textContent = m.t;
-    sp.addEventListener('click', () => { memos[i].d = !memos[i].d; save('memos', memos); renderMemos(); });
-    const del = document.createElement('button'); del.type = 'button'; del.textContent = '지우기';
-    del.addEventListener('click', () => { memos.splice(i, 1); save('memos', memos); renderMemos(); });
-    li.append(sp, del); ul.append(li);
-  });
+/* 실내 공기: Home Assistant REST API */
+let ha = load('ha');
+async function haState(id) {
+  const r = await fetch(`${ha.url.replace(/\/+$/, '')}/api/states/${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${ha.token}` } });
+  if (r.status === 401) throw new Error('토큰이 맞지 않아요.');
+  if (r.status === 404) throw new Error(`센서 ${id}를 찾지 못했어요.`);
+  if (!r.ok) throw new Error(`응답 오류 (${r.status})`);
+  const s = await r.json();
+  const v = parseFloat(s.state);
+  return Number.isFinite(v) ? v : null;
 }
-$('#mf').addEventListener('submit', e => {
+async function indoorAir() {
+  if (!ha || !ha.url || !ha.token || !ha.pm) {
+    $('#inAir').innerHTML = '<span class="off">공기청정기 연결 전이에요.<br>눌러서 설정</span>';
+    return null;
+  }
+  try {
+    const [pm, hum, temp] = await Promise.all([
+      haState(ha.pm),
+      ha.hum ? haState(ha.hum).catch(() => null) : null,
+      ha.temp ? haState(ha.temp).catch(() => null) : null
+    ]);
+    if (pm === null) throw new Error('공기청정기 값이 비어 있어요.');
+    const g = grade(pm, CUT.pm25);
+    const row = (name, val, unit, cls = '') => `<span>${name}<span><b class="${cls}">${Math.round(val)}</b><small>${unit}</small></span></span>`;
+    let rows = row('초미세먼지', pm, '㎍/㎥', `g${g}`);
+    if (hum !== null) rows += row('습도', hum, '%');
+    if (temp !== null) rows += row('온도', temp, '°');
+    $('#inAir').innerHTML = `<span class="aq-grade g${g}">${GRADE[g]}</span><span class="aq-rows">${rows}</span>`;
+    return true;
+  } catch (e) {
+    const msg = e instanceof TypeError ? 'Home Assistant에 연결하지 못했어요.' : e.message;
+    $('#inAir').innerHTML = `<span class="off">${esc(msg)}<br>눌러서 설정 확인</span>`;
+    return msg;
+  }
+}
+
+/* 설정 화면 */
+function openSheet() {
+  const c = ha || {};
+  $('#haUrl').value = c.url || 'http://localhost:8123';
+  $('#haToken').value = c.token || '';
+  $('#haPm').value = c.pm || '';
+  $('#haHum').value = c.hum || '';
+  $('#haTemp').value = c.temp || '';
+  $('#haMsg').textContent = '';
+  $('#haSheet').classList.add('open');
+}
+const closeSheet = () => $('#haSheet').classList.remove('open');
+$('#inCard').addEventListener('click', openSheet);
+document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeSheet));
+$('#haForm').addEventListener('submit', async e => {
   e.preventDefault();
-  const v = $('#mi').value.trim(); if (!v) return;
-  memos.unshift({ t: v, d: false }); save('memos', memos); $('#mi').value = ''; renderMemos();
+  ha = { url: $('#haUrl').value.trim(), token: $('#haToken').value.trim(), pm: $('#haPm').value.trim(), hum: $('#haHum').value.trim(), temp: $('#haTemp').value.trim() };
+  if (!ha.url || !ha.token || !ha.pm) { $('#haMsg').textContent = '주소, 토큰, 초미세먼지 센서는 꼭 넣어 주세요.'; return; }
+  save('ha', ha);
+  $('#haMsg').textContent = '연결해 보는 중…';
+  const ok = await indoorAir();
+  if (ok === true) { $('#haMsg').textContent = '연결됐어요.'; setTimeout(closeSheet, 800); }
+  else $('#haMsg').textContent = ok;
 });
-renderMemos();
+$('#haClear').addEventListener('click', () => {
+  ha = null;
+  try { localStorage.removeItem('hub-ha'); } catch (e) {}
+  indoorAir(); $('#haMsg').textContent = '연결 정보를 지웠어요.';
+});
 
+/* 갱신 주기 */
+function refreshOutdoor() { weather(); outdoorAir(); }
+refreshOutdoor();
+indoorAir();
+setInterval(refreshOutdoor, 30 * 60 * 1000);
+setInterval(indoorAir, 60 * 1000);
+
+/* 화면 켜짐 유지 */
 let lock = null;
 async function keepAwake() {
   try { if ('wakeLock' in navigator && !lock) { lock = await navigator.wakeLock.request('screen'); lock.addEventListener('release', () => { lock = null; }); } } catch (e) {}
 }
 document.addEventListener('click', keepAwake);
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { keepAwake(); weather(); } });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { keepAwake(); refreshOutdoor(); indoorAir(); } });
 </script>
 </body>
 </html>
