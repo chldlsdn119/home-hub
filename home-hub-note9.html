@@ -75,6 +75,17 @@ button.row{border-width:0 0 0 0;padding-left:0;padding-right:0;min-height:0}
 [data-theme="night"] .nseal{display:flex;gap:6px;position:absolute;top:clamp(14px,4.4vh,22px);right:clamp(16px,3vw,26px)}
 .nseal .seal{background:transparent;color:var(--red);box-shadow:inset 0 0 0 1px var(--red);font-weight:400}
 
+/* 주방등 버튼: 오른쪽 아래 구석 도장 */
+.lamp{position:absolute;right:clamp(16px,3vw,26px);bottom:clamp(14px,4.4vh,22px);min-height:0;width:clamp(48px,14vh,60px);height:clamp(48px,14vh,60px);padding:4px;
+  border:1.5px solid var(--accent);border-radius:6px;background:var(--paper);color:var(--accent);font-size:clamp(11px,3.2vh,14px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;line-height:1.1;transition:background .3s,color .3s}
+.lamp span{width:55%;display:block}
+.lamp svg{width:100%;height:auto;display:block}
+.lamp[aria-pressed="true"]{background:#E3A23B;border-color:#C98A22;color:#3A2A10}
+.lamp.busy{opacity:.55}
+.lamp[hidden]{display:none}
+[data-theme="night"] .lamp{display:none}
+@media (orientation:portrait){.lamp{bottom:16px}}
 .toast{position:fixed;left:50%;bottom:6vh;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:4px;font-size:15px;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:.92}
 
@@ -121,6 +132,7 @@ button.row{border-width:0 0 0 0;padding-left:0;padding-right:0;min-height:0}
       <div class="row" id="outRow"><span></span><div class="off">미세먼지를 불러오는 중이에요.</div></div>
       <button type="button" class="row" id="inRow" aria-label="우리집 공기, 눌러서 공기청정기 연결 설정"><span></span><span class="off">공기청정기를 확인하는 중이에요.</span></button>
     </div>
+    <button type="button" class="lamp" id="lamp" hidden aria-pressed="false" aria-label="주방등 켜기"><span id="lampIcon"></span>주방</button>
     <div class="nseal" id="nseal" aria-hidden="true"></div>
   </div>
 </main>
@@ -538,6 +550,37 @@ $('#haClear').addEventListener('click', () => {
   try { localStorage.removeItem('hub-ha'); } catch (e) {}
   indoorAir(); $('#haMsg').textContent = '연결 정보를 지웠어요.';
 });
+
+/* ───────── 주방등: Home Assistant 웹훅 → 구글 어시스턴트 ─────────
+   켜짐/꺼짐 상태는 구글에서 읽어 올 수 없어서, 마지막으로 누른 상태를 기억해요. */
+// 웹훅 주소는 공개 저장소에 두지 않고, 노트9의 hub-config.json({"lampHook": "..."})에서 읽어요.
+let LAMP_HOOK = null;
+fetch('hub-config.json?t=' + Date.now(), { cache: 'no-store' })
+  .then(r => r.ok ? r.json() : null)
+  .then(c => { if (c && c.lampHook) { LAMP_HOOK = '/api/webhook/' + encodeURIComponent(c.lampHook); $('#lamp').hidden = false; } })
+  .catch(() => {});
+let lampOn = load('kitchen') === true;
+const lampSvg = on => svg(`<path d="M20 6a10 10 0 0 0-6 18v4h12v-4A10 10 0 0 0 20 6z" fill="${on ? '#FFF3C4' : '#F2C86A'}" stroke="${on ? '#8A5A10' : '#A8967A'}" stroke-width="2"/><path d="M15 32h10M16.5 36h7" stroke="${on ? '#8A5A10' : '#A8967A'}" stroke-width="2.4" stroke-linecap="round"/>`);
+function drawLamp() {
+  $('#lampIcon').innerHTML = lampSvg(lampOn);
+  $('#lamp').setAttribute('aria-pressed', String(lampOn));
+  $('#lamp').setAttribute('aria-label', lampOn ? '주방등 끄기' : '주방등 켜기');
+}
+$('#lamp').addEventListener('click', async () => {
+  const b = $('#lamp');
+  if (b.classList.contains('busy') || !LAMP_HOOK) return;
+  const next = !lampOn;
+  b.classList.add('busy');
+  try {
+    const r = await fetch(LAMP_HOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ state: next ? 'on' : 'off' }) });
+    if (!r.ok) throw new Error(String(r.status));
+    lampOn = next; save('kitchen', lampOn); drawLamp();
+    toast(lampOn ? '주방등을 켰어요' : '주방등을 껐어요');
+  } catch (e) {
+    toast('주방등에 명령을 보내지 못했어요');
+  } finally { b.classList.remove('busy'); }
+});
+drawLamp();
 
 /* ───────── 시작과 갱신 주기 ───────── */
 tick();
