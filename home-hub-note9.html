@@ -85,6 +85,26 @@ button.row{border-width:0 0 0 0;padding-left:0;padding-right:0;min-height:0}
 .lamp.busy{opacity:.55}
 .lamp[hidden]{display:none}
 [data-theme="night"] .lamp{display:none}
+/* 공기청정기 버튼(주방 버튼 왼쪽)과 설정 창 */
+.lamp.fanb{right:calc(clamp(16px,3vw,26px) + clamp(48px,14vh,60px) + 10px);border-color:#5E8A47;color:#2F4A22}
+.lamp.fanb[aria-pressed="true"]{background:#7FA36A;border-color:#5E8A47;color:#fff}
+.pnl{position:absolute;right:clamp(16px,3vw,26px);bottom:calc(clamp(14px,4.4vh,22px) + clamp(48px,14vh,60px) + 10px);width:min(62vw,470px);z-index:3;
+  background:var(--paper);border:1.5px solid var(--accent);border-radius:8px;padding:clamp(10px,3vh,14px) 16px;box-shadow:0 6px 20px rgba(60,40,20,.12)}
+.pnl[hidden]{display:none}
+.pnl-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:clamp(14px,4vh,17px)}
+.pnl-h button{border:none;min-height:36px;padding:0 4px;font-size:14px;color:var(--sub)}
+.pr{display:grid;grid-template-columns:clamp(48px,9vw,70px) 1fr;align-items:center;gap:8px;padding:clamp(4px,1.4vh,7px) 0;border-bottom:1px dashed var(--line);font-size:clamp(13px,3.8vh,16px)}
+.pr:last-child{border-bottom:none}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button,.lv button{min-height:clamp(32px,9vh,40px);border:1.5px solid var(--accent);color:var(--accent);border-radius:999px;padding:0 14px;font-size:clamp(13px,3.8vh,15px);font-weight:700;background:transparent}
+.seg button[aria-pressed="true"]{background:#7FA36A;border-color:#5E8A47;color:#fff}
+.lv{display:flex;align-items:center;gap:8px}
+.lv button{width:clamp(32px,9vh,40px);padding:0;font-size:20px}
+.lv i{flex:1;height:8px;border-radius:4px;background:var(--track);overflow:hidden}
+.lv i b{display:block;height:100%;background:#7FA36A;border-radius:4px}
+.lv span{font-size:13px;color:var(--sub);min-width:3.6em;text-align:right}
+.pnl.busy{opacity:.7}
+[data-theme="night"] .pnl{display:none}
 @media (orientation:portrait){.lamp{bottom:16px}}
 .toast{position:fixed;left:50%;bottom:6vh;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:4px;font-size:15px;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:.92}
@@ -131,6 +151,14 @@ button.row{border-width:0 0 0 0;padding-left:0;padding-right:0;min-height:0}
       <div class="row" id="wxRow" aria-live="polite"><span></span><div class="off">날씨를 불러오는 중이에요.</div></div>
       <div class="row" id="outRow"><span></span><div class="off">미세먼지를 불러오는 중이에요.</div></div>
       <button type="button" class="row" id="inRow" aria-label="우리집 공기, 눌러서 공기청정기 연결 설정"><span></span><span class="off">공기청정기를 확인하는 중이에요.</span></button>
+    </div>
+    <button type="button" class="lamp fanb" id="fanBtn" hidden aria-pressed="false" aria-expanded="false" aria-controls="pnl" aria-label="공기청정기 설정 열기"><span id="fanIcon"></span>청정기</button>
+    <div class="pnl" id="pnl" hidden role="dialog" aria-label="공기청정기 설정">
+      <div class="pnl-h"><span>공기청정기</span><button type="button" id="pnlClose">닫기 ✕</button></div>
+      <div class="pr"><span>전원</span><div class="seg" data-act="power"><button type="button" data-v="on">켜짐</button><button type="button" data-v="off">꺼짐</button></div></div>
+      <div class="pr"><span>모드</span><div class="seg" data-act="mode"><button type="button" data-v="Auto">자동</button><button type="button" data-v="Silent">수면</button><button type="button" data-v="Favorite">수동</button></div></div>
+      <div class="pr"><span>세기</span><div class="lv"><button type="button" id="lvDown" aria-label="세기 낮추기">－</button><i><b id="lvBar"></b></i><button type="button" id="lvUp" aria-label="세기 높이기">＋</button><span id="lvText"></span></div></div>
+      <div class="pr"><span>불빛</span><div class="seg" data-act="led"><button type="button" data-v="bright">밝게</button><button type="button" data-v="dim">어둡게</button><button type="button" data-v="off">끄기</button></div></div>
     </div>
     <button type="button" class="lamp" id="lamp" hidden aria-pressed="false" aria-label="주방등 켜기"><span id="lampIcon"></span>주방</button>
     <div class="nseal" id="nseal" aria-hidden="true"></div>
@@ -475,6 +503,7 @@ async function indoorAir() {
     if (!j) { inOff('공기청정기 연결 전이에요.<br>눌러서 설정'); return null; }
     if (Date.now() / 1000 - j.updated > 10 * 60) { inOff('공기청정기가 응답하지 않아요.<br>전원과 와이파이를 확인해 주세요'); return null; }
     showIndoor(j.pm25, j.humidity ?? null, j.temperature ?? null);
+    if (typeof setPurifier === 'function') setPurifier(j);
     return true;
   }
   try {
@@ -557,7 +586,10 @@ $('#haClear').addEventListener('click', () => {
 let LAMP_HOOK = null;
 fetch('hub-config.json?t=' + Date.now(), { cache: 'no-store' })
   .then(r => r.ok ? r.json() : null)
-  .then(c => { if (c && c.lampHook) { LAMP_HOOK = '/api/webhook/' + encodeURIComponent(c.lampHook); $('#lamp').hidden = false; } })
+  .then(c => {
+    if (c && c.lampHook) { LAMP_HOOK = '/api/webhook/' + encodeURIComponent(c.lampHook); $('#lamp').hidden = false; }
+    if (c && c.purifierHook) { PUR_HOOK = '/api/webhook/' + encodeURIComponent(c.purifierHook); $('#fanBtn').hidden = false; }
+  })
   .catch(() => {});
 let lampOn = load('kitchen') === true;
 const lampSvg = on => svg(`<path d="M20 6a10 10 0 0 0-6 18v4h12v-4A10 10 0 0 0 20 6z" fill="${on ? '#FFF3C4' : '#F2C86A'}" stroke="${on ? '#8A5A10' : '#A8967A'}" stroke-width="2"/><path d="M15 32h10M16.5 36h7" stroke="${on ? '#8A5A10' : '#A8967A'}" stroke-width="2.4" stroke-linecap="round"/>`);
@@ -581,6 +613,69 @@ $('#lamp').addEventListener('click', async () => {
   } finally { b.classList.remove('busy'); }
 });
 drawLamp();
+
+/* ───────── 공기청정기 설정: 상태는 air.json, 명령은 Home Assistant 웹훅 ───────── */
+let PUR_HOOK = null;
+let pur = null; // { power, mode, level, led }
+const MODE_KEY = { auto: 'Auto', silent: 'Silent', favorite: 'Favorite' };
+const fanSvg = on => svg(`<rect x="11" y="5" width="18" height="30" rx="4" fill="#FFFCF6" stroke="${on ? '#3F6A2C' : '#A8967A'}" stroke-width="2"/><circle cx="20" cy="15" r="5" fill="none" stroke="${on ? '#3F6A2C' : '#7FA36A'}" stroke-width="2.2"/><path d="M15 26h10M15 30h10" stroke="${on ? '#3F6A2C' : '#A8967A'}" stroke-width="2" stroke-linecap="round"/>`);
+function drawPurifier() {
+  const on = !!pur && pur.power === 'on';
+  $('#fanIcon').innerHTML = fanSvg(on);
+  $('#fanBtn').setAttribute('aria-pressed', String(on));
+  if (!pur) return;
+  const sel = { power: pur.power, mode: MODE_KEY[pur.mode] || '', led: pur.led };
+  document.querySelectorAll('#pnl .seg').forEach(g => g.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === sel[g.dataset.act]))));
+  const lv = Number.isFinite(pur.level) ? pur.level : 0;
+  $('#lvBar').style.width = Math.round(lv / 17 * 100) + '%';
+  $('#lvText').textContent = `${lv} / 17`;
+}
+function setPurifier(j) {
+  if (!j || !j.ok) return;
+  if ($('#pnl').classList.contains('busy')) return; // 명령 보내는 중에는 화면 유지
+  if (j.updated < lastCmd + 3) return; // 명령 전에 읽은 값이면 무시 (화면이 되돌아가지 않게)
+  pur = { power: j.power, mode: j.mode, level: j.level, led: j.led };
+  drawPurifier();
+}
+let pnlTimer = 0;
+const pnlIdle = () => { clearTimeout(pnlTimer); pnlTimer = setTimeout(closePnl, 20000); };
+function openPnl() { $('#pnl').hidden = false; $('#fanBtn').setAttribute('aria-expanded', 'true'); drawPurifier(); pnlIdle(); }
+function closePnl() { $('#pnl').hidden = true; $('#fanBtn').setAttribute('aria-expanded', 'false'); clearTimeout(pnlTimer); }
+$('#fanBtn').addEventListener('click', () => { if ($('#pnl').hidden) openPnl(); else closePnl(); });
+$('#pnlClose').addEventListener('click', closePnl);
+let refreshTimers = [], lastCmd = 0;
+async function purCmd(action, value, optimistic) {
+  if (!PUR_HOOK) return;
+  pnlIdle();
+  const p = $('#pnl');
+  p.classList.add('busy');
+  try {
+    const r = await fetch(PUR_HOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, value: String(value) }) });
+    if (!r.ok) throw new Error(String(r.status));
+    lastCmd = Math.floor(Date.now() / 1000);
+    if (pur) { Object.assign(pur, optimistic); drawPurifier(); }
+  } catch (e) {
+    toast('공기청정기에 명령을 보내지 못했어요');
+  } finally {
+    p.classList.remove('busy');
+    // 공기청정기가 바뀐 값을 air.json에 반영할 시간(최대 30초)을 두고 다시 읽기
+    refreshTimers.forEach(clearTimeout);
+    refreshTimers = [setTimeout(indoorAir, 35000), setTimeout(indoorAir, 65000)];
+  }
+}
+document.querySelectorAll('#pnl .seg').forEach(g => g.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const act = g.dataset.act, v = b.dataset.v;
+  const opt = act === 'power' ? { power: v } : act === 'mode' ? { mode: v.toLowerCase(), power: 'on' } : { led: v };
+  purCmd(act, v, opt);
+}));
+const stepLevel = d => {
+  const lv = Math.min(17, Math.max(0, ((pur && Number.isFinite(pur.level)) ? pur.level : 0) + d));
+  purCmd('level', lv, { level: lv, mode: 'favorite', power: 'on' });
+};
+$('#lvDown').addEventListener('click', () => stepLevel(-1));
+$('#lvUp').addEventListener('click', () => stepLevel(1));
+drawPurifier();
 
 /* ───────── 시작과 갱신 주기 ───────── */
 tick();
