@@ -386,13 +386,13 @@ function wxIcon(kind, p) {
 const hillIcon = (p, g) => svg(`<path d="M3 32l11-16 7 9 5-6 11 13z" fill="${p.hill}"/><path d="M14 16l3.5 5h-7z" fill="${p.snowcap}" opacity=".7"/>` + (g === null ? '' : `<circle cx="31" cy="10" r="4.5" fill="var(--g${g})"/>`));
 const houseIcon = (p, g) => svg(`<path d="M3 18q17-12 34 0q-3 0-5 1H8q-2-1-5-1z" fill="${p.roof}"/><rect x="9" y="19" width="22" height="13" fill="${p.wall}" stroke="${p.edge}" stroke-width="2"/><path d="M17 32v-8h6v8M9 25h22" stroke="${p.edge}" stroke-width="2" fill="none"/>` + (g === null ? '' : `<circle cx="33" cy="30" r="4.5" fill="var(--g${g})"/>`));
 
-/* ───────── 화면 모드: 자동(밤 9시~아침 6시 밤 화면) / 낮 / 밤 ───────── */
+/* ───────── 화면 모드: 자동(밤 11시 30분~아침 6시 밤 화면) / 낮 / 밤 ───────── */
 let mode = load('hanji-mode') || 'auto';
-const isNight = h => h >= 21 || h < 6;
+const isNight = d => { const m = d.getHours() * 60 + d.getMinutes(); return m >= 23 * 60 + 30 || m < 6 * 60; };
 let night = null;
 function applyTheme() {
-  const h = new Date().getHours();
-  const nowNight = mode === 'night' || (mode === 'auto' && isNight(h));
+  const now = new Date();
+  const nowNight = mode === 'night' || (mode === 'auto' && isNight(now));
   if (nowNight === night) return;
   night = nowNight;
   if (night) document.documentElement.dataset.theme = 'night'; else delete document.documentElement.dataset.theme;
@@ -405,7 +405,7 @@ function cycleMode() {
   mode = { auto: 'day', day: 'night', night: 'auto' }[mode];
   save('hanji-mode', mode);
   night = null; applyTheme();
-  toast({ auto: '화면: 자동 (밤 9시~아침 6시 어둡게)', day: '화면: 늘 낮 화면', night: '화면: 늘 밤 화면' }[mode]);
+  toast({ auto: '화면: 자동 (밤 11시 30분~아침 6시 어둡게)', day: '화면: 늘 낮 화면', night: '화면: 늘 밤 화면' }[mode]);
 }
 $('#time').addEventListener('click', cycleMode);
 $('#time').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cycleMode(); } });
